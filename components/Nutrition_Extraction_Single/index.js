@@ -1,30 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, ActivityIndicator, ImageBackground } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ActivityIndicator, ImageBackground, ScrollView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import axios from 'axios';
-import { useNavigation } from '@react-navigation/native';
-import { BlurView } from 'expo-blur';
 
-export default function HealthModel() {
+export default function Nutrition_Extraction_Single() {
   const [image, setImage] = useState(null);
-  const [prediction, setPrediction] = useState(null);
+  const [nutritionData, setNutritionData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [facing, setFacing] = useState('back');
   const [permission, requestPermission] = useCameraPermissions();
   const [photo, setPhoto] = useState(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const cameraRef = useRef(null);
-  const navigation = useNavigation();
 
   useEffect(() => {
-    const checkPermissions = async () => {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        alert('Permission to access media library is required!');
-      }
-    };
-    checkPermissions();
+    ImagePicker.requestMediaLibraryPermissionsAsync();
   }, []);
 
   const pickImage = async () => {
@@ -33,7 +24,7 @@ export default function HealthModel() {
       allowsEditing: true,
       quality: 1,
     });
-    if (!result.canceled && result.assets && result.assets[0].uri) {
+    if (!result.canceled && result.assets?.[0]?.uri) {
       setImage(result.assets[0].uri);
     }
   };
@@ -48,26 +39,22 @@ export default function HealthModel() {
     const formData = new FormData();
     formData.append('image', {
       uri: imageUri,
-      name: 'image.jpg',
+      name: 'nutrition.jpg',
       type: 'image/jpeg',
     });
 
     try {
-      const response = await axios.post('http://192.168.18.8:5000/diagnoseHealth', formData, {
+      const response = await axios.post('http://192.168.18.8:5004/analyze_rice', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      setPrediction(response.data.diagnosis);
+      //console.log(response.data);
+      setNutritionData(response.data);
+      console.log(Object.entries(nutritionData));
     } catch (error) {
-      alert('Error uploading image');
+      alert('Failed to extract nutrition information');
     } finally {
       setLoading(false);
     }
-  };
-
-  const reset = () => {
-    setImage(null);
-    setPhoto(null);
-    setPrediction(null);
   };
 
   const takePhoto = async () => {
@@ -77,6 +64,12 @@ export default function HealthModel() {
       setIsCameraOpen(false);
       uploadImage(photo.uri);
     }
+  };
+
+  const reset = () => {
+    setImage(null);
+    setPhoto(null);
+    setNutritionData(null);
   };
 
   if (isCameraOpen) {
@@ -103,7 +96,7 @@ export default function HealthModel() {
         source={require('../../assets/background.png')}
         style={styles.backgroundImage}
       >
-        <Text style={styles.title}>Health Diagnosis</Text>
+        <Text style={styles.title}>Nutrition Extractor</Text>
         {image || photo ? (
           <Image source={{ uri: photo || image }} style={styles.imagePreview} />
         ) : (
@@ -120,10 +113,19 @@ export default function HealthModel() {
           onPress={() => uploadImage(photo || image)}
           disabled={loading}
         >
-          <Text style={styles.buttonText}>{loading ? 'Processing...' : 'Diagnose'}</Text>
+          <Text style={styles.buttonText}>{loading ? 'Extracting...' : 'Extract Nutrition'}</Text>
           {loading && <ActivityIndicator size="small" color="#fff" />}
         </TouchableOpacity>
-        {prediction && <Text style={styles.result}>Prediction: {prediction}</Text>}
+
+        {nutritionData && (
+          <ScrollView style={styles.scrollArea}>
+            {Object.entries(nutritionData).map(([key, value], index) => (
+              <Text key={index} style={styles.result}>
+                {key}: {typeof value === 'object' ? JSON.stringify(value) : value}
+              </Text>
+            ))}
+          </ScrollView>
+        )}
         <TouchableOpacity style={styles.buttonReset} onPress={reset}>
           <Text style={styles.buttonText}>Reset</Text>
         </TouchableOpacity>
@@ -135,113 +137,89 @@ export default function HealthModel() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'top',
-    alignItems: 'top',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginBottom: 20,
-    color: 'black',
-    fontWeight: 'bold',
-    fontStyle: 'Arial',
   },
   backgroundImage: {
     flex: 1,
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  absolute: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    bottom: 0,
-    right: 0,
-  },
-  button: {
-    backgroundColor: 'yellowgreen',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    marginTop: 10,
     alignItems: 'center',
-    width: '80%',
+    paddingTop: 60,
   },
-  buttonDiagnose: {
-    backgroundColor: 'lightblue',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    marginTop: 10,
-    alignItems: 'center',
-    width: '80%',
-  },
-  buttonReset: {
-    backgroundColor: 'lightcoral',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    marginTop: 10,
-    alignItems: 'center',
-    width: '80%',
-  },
-  buttonText: {
+  title: {
+    fontSize: 26,
+    fontWeight: 'bold',
     color: 'black',
-    fontSize: 18,
-    fontWeight: '600',
-    fontStyle: 'Arial',
+    marginBottom: 20,
   },
   imagePreview: {
-    width: 300,
-    height: 300,
-    borderRadius: 15,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    marginBottom: 20,
+    width: 250,
+    height: 250,
+    borderRadius: 10,
+    marginBottom: 10,
+    borderWidth: 2,
+    borderColor: '#fff',
   },
   placeholderText: {
+    color: '#ccc',
     fontSize: 16,
-    color: '#aaa',
-    marginBottom: 20,
+    marginBottom: 10,
   },
-  disabledButton: {
-    backgroundColor: '#A9A9A9',
-  },
-  result: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    marginVertical: 10,
-    textAlign: 'center',
-  },
-  backButton: {
-    position: 'absolute',
-    top: 40,
-    left: 20,
-    flexDirection: 'row',
+  button: {
+    backgroundColor: '#2a9d8f',
+    padding: 10,
+    marginTop: 10,
+    borderRadius: 8,
+    width: 200,
     alignItems: 'center',
   },
-  backButtonText: {
-    color: "#007AFF", // iOS-like blue color for back button
+  buttonDiagnose: {
+    backgroundColor: '#e76f51',
+    padding: 10,
+    marginTop: 10,
+    borderRadius: 8,
+    width: 200,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  disabledButton: {
+    opacity: 0.6,
+  },
+  buttonReset: {
+    backgroundColor: '#264653',
+    padding: 10,
+    marginTop: 15,
+    borderRadius: 8,
+    width: 200,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  result: {
+    color: '#333',
     fontSize: 16,
-    fontWeight: "bold",
+    marginVertical: 2,
   },
   camera: {
     flex: 1,
-    width: '100%',
+    justifyContent: 'flex-end',
   },
   cameraControls: {
-    position: 'absolute',
-    bottom: 30,
-    left: 0,
-    right: 0,
     flexDirection: 'row',
     justifyContent: 'space-around',
-    padding: 10,
+    marginBottom: 30,
   },
   cameraText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 18,
+    padding: 10,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 5,
+  },
+  scrollArea: {
+    maxHeight: 200,
+    marginTop: 10,
+    paddingHorizontal: 10,
+    width: '90%',
   },
 });

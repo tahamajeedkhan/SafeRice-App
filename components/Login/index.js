@@ -23,13 +23,13 @@ const Login = ({ navigation }) => {
     }
 
     try {
-      const response = await axios.post("http://172.16.65.127:5001/login", {
+      const response = await axios.post("http://192.168.18.8:5001/login", {
         username,
         password,
       });
 
       if (response.data.success) {
-        console.log(response.data);
+
 
         // Store the JWT token and user ID in AsyncStorage
         await AsyncStorage.setItem("authToken", response.data.token);
@@ -37,7 +37,13 @@ const Login = ({ navigation }) => {
 
         // Display success message and navigate to MainMenu
         Alert.alert("Login Successful", "You are now logged in");
-        navigation.navigate("MainMenu");
+        navigation.navigate('MainApp', {
+          screen: 'Home',
+          params: {
+            screen: 'MainMenu'
+          }
+        });
+        
       } else {
         Alert.alert("Login Failed", response.data.message);
       }
@@ -48,16 +54,14 @@ const Login = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <ImageBackground
-        source={require("../../assets/riceback.jpg")}
-        style={styles.backgroundImage}
-      >
-        <BlurView style={styles.absolute} intensity={50} tint="light" />
-
+    <ImageBackground
+      source={require("../../assets/background.png")}
+      style={styles.background}
+      resizeMode="cover"
+    >
+      <View style={styles.container}>
         <Text style={styles.title}>Login</Text>
 
-        {/* Username input */}
         <TextInput
           style={styles.input}
           placeholder="Username"
@@ -66,7 +70,6 @@ const Login = ({ navigation }) => {
           onChangeText={setUsername}
         />
 
-        {/* Password input */}
         <TextInput
           style={styles.input}
           placeholder="Password"
@@ -76,34 +79,37 @@ const Login = ({ navigation }) => {
           onChangeText={setPassword}
         />
 
-        {/* Login Button */}
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
 
-        {/* Sign Up Button */}
+
         <TouchableOpacity
           style={[styles.button, styles.signupButton]}
           onPress={() => navigation.navigate("SignUp")}
         >
-          <Text style={styles.buttonText}>Don't have an account? Sign Up</Text>
+          <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
-      </ImageBackground>
-    </View>
+      </View>
+    </ImageBackground>
   );
 };
 
-// Styles for the screen
 const styles = StyleSheet.create({
-  container: {
+  background: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
+  container: {
+    width: "100%",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
   title: {
     fontSize: 36,
-    fontWeight: "700",
-    color: "#333",
+    fontWeight: "bold",
+    color: 'black',
     marginBottom: 30,
     textAlign: "center",
   },
@@ -112,27 +118,14 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     marginVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#fff",
+    borderBottomColor: "black",
     fontSize: 16,
-    color: "#fff",
+    color: "black",
     backgroundColor: "transparent",
     textAlign: "center",
   },
-  backgroundImage: {
-    flex: 1,
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  absolute: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    bottom: 0,
-    right: 0,
-  },
   button: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: "yellowgreen",
     paddingVertical: 14,
     paddingHorizontal: 40,
     borderRadius: 25,
@@ -147,15 +140,17 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   signupButton: {
-    backgroundColor: "#00796B",
+    backgroundColor: "yellowgreen",
     marginTop: 10,
   },
   buttonText: {
-    color: "#fff",
+    color: "black",
     fontSize: 16,
     fontWeight: "600",
     textAlign: "center",
   },
 });
+
+
 
 export default Login;

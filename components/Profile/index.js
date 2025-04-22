@@ -32,7 +32,7 @@ const Profile = ({ navigation }) => {
     if (token && userId) {
       const fetchUserData = async () => {
         try {
-          const response = await fetch('http://172.16.65.127:5001/getProfile', {
+          const response = await fetch('http://192.168.18.8:5001/getProfile', {
             method: 'GET',
             headers: {
               Authorization: `Bearer ${token}`,
@@ -76,14 +76,10 @@ const Profile = ({ navigation }) => {
 
   return (
     <ImageBackground
-      source={require('../../assets/riceback.jpg')} // Path to your background image
+      source={require('../../assets/background.png')} 
       style={styles.backgroundImage}
     >
-      <BlurView
-        style={styles.absolute}
-        intensity={50}
-        tint="light"
-      />
+
       <View style={styles.container}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
@@ -189,7 +185,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#4CAF50',
     fontSize: 16,
-    color: '#333',
+    color: 'black',
     backgroundColor: 'transparent',
     textAlign: 'center',
   },

@@ -32,7 +32,7 @@ const EditProfile = ({ navigation }) => {
     if (token && userId) {
       const fetchUserData = async () => {
         try {
-          const response = await fetch('http://19172.16.65.127:5001/getProfile', {
+          const response = await fetch('http://192.168.18.8:5001/getProfile', {
             method: 'GET',
             headers: {
               Authorization: `Bearer ${token}`,
@@ -60,7 +60,7 @@ const EditProfile = ({ navigation }) => {
   const saveChanges = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://172.16.65.127:5001/updateProfile', {
+      const response = await fetch('http://192.168.18.8:5001/updateProfile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

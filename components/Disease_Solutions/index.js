@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, ImageBackground } from 'react-native';
 import axios from 'axios';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { BlurView } from 'expo-blur';
 
 export default function Disease_Solutions() {
   const route = useRoute();
@@ -19,8 +18,7 @@ export default function Disease_Solutions() {
   useEffect(() => {
     const fetchDiseaseSolutions = async () => {
       try {
-        const response = await axios.get('http://172.16.65.127:5001/getDiseaseSolutions');
-        console.log(response.data);
+        const response = await axios.get('http://192.168.18.8:5001/getDiseaseSolutions');
         setDiseaseData(response.data);
         const dropdownItems = response.data.map((disease) => ({
           label: disease.name,
@@ -37,7 +35,7 @@ export default function Disease_Solutions() {
     fetchDiseaseSolutions();
   }, []);
 
-  const showSolution = () => {
+  const showSolution = useCallback(() => {
     if (selectedDisease && diseaseData.length > 0) {
       const disease = diseaseData.find((d) => d.name === selectedDisease);
       if (disease) {
@@ -48,7 +46,7 @@ export default function Disease_Solutions() {
     } else {
       setSolution('Please select a disease to view the solution.');
     }
-  };
+  }, [selectedDisease, diseaseData]);
 
   if (loading) {
     return (
@@ -61,45 +59,38 @@ export default function Disease_Solutions() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <ImageBackground
-          source={require('../../assets/riceback.jpg')}
-          style={styles.backgroundImage}
-        >
-          <BlurView style={styles.absolute} intensity={50} tint="light" />
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Text style={styles.backButtonText}>Back</Text>
-      </TouchableOpacity>
-      <Text style={styles.title}>Disease Solution</Text>
-      {predictedDisease ? (
-        <View style={styles.predictedDiseaseContainer}>
-          <Text style={styles.predictedText}>Predicted Disease:</Text>
-          <Text style={styles.predictedDisease}>{predictedDisease}</Text>
-        </View>
-      ) : (
-        <View style={styles.pickerContainer}>
-          <Text style={styles.label}>Select a Disease:</Text>
-          <DropDownPicker
-            open={open}
-            value={selectedDisease}
-            items={items}
-            setOpen={setOpen}
-            setValue={setSelectedDisease}
-            setItems={setItems}
-            placeholder="Select a disease"
-            style={styles.dropdown}
-            dropDownStyle={styles.dropdownStyle}
-            containerStyle={styles.dropdownContainer}
-          />
-        </View>
-      )}
-      <TouchableOpacity style={styles.button} onPress={showSolution}>
-        <Text style={styles.buttonText}>Show Solution</Text>
-      </TouchableOpacity>
-      {solution && (
-        <View style={styles.solutionContainer}>
-          <Text style={styles.solutionText}>{solution}</Text>
-        </View>
-      )}
+      <ImageBackground source={require('../../assets/background.png')} style={styles.backgroundImage}>
+        <Text style={styles.title}>Disease Solution</Text>
+        {predictedDisease ? (
+          <View style={styles.predictedDiseaseContainer}>
+            <Text style={styles.predictedText}>Predicted Disease:</Text>
+            <Text style={styles.predictedDisease}>{predictedDisease}</Text>
+          </View>
+        ) : (
+          <View style={styles.pickerContainer}>
+            <Text style={styles.label}>Select a Disease:</Text>
+            <DropDownPicker
+              open={open}
+              value={selectedDisease}
+              items={items}
+              setOpen={setOpen}
+              setValue={setSelectedDisease}
+              setItems={setItems}
+              placeholder="Select a disease"
+              style={styles.dropdown}
+              dropDownStyle={styles.dropdownStyle}
+              containerStyle={styles.dropdownContainer}
+            />
+          </View>
+        )}
+        <TouchableOpacity style={styles.button} onPress={showSolution}>
+          <Text style={styles.buttonText}>Show Solution</Text>
+        </TouchableOpacity>
+        {solution && (
+          <View style={styles.solutionContainer}>
+            <Text style={styles.solutionText}>{solution}</Text>
+          </View>
+        )}
       </ImageBackground>
     </ScrollView>
   );
@@ -116,7 +107,8 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textAlign: 'center',
     marginBottom: 30,
-    color: '#333',
+    color: 'black',
+    fontWeight: 'bold',
   },
   backgroundImage: {
     flex: 1,
@@ -124,19 +116,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  absolute: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    bottom: 0,
-    right: 0,
-  },
   predictedDiseaseContainer: {
     backgroundColor: '#eafaf1',
     borderRadius: 8,
     padding: 15,
     marginBottom: 20,
-    // backgroundColor: 'transparent',
     alignItems: 'center',
     shadowColor: '#000',
     shadowOpacity: 0.1,
@@ -147,14 +131,12 @@ const styles = StyleSheet.create({
   predictedText: {
     fontSize: 16,
     color: '#4CAF50',
-    // backgroundColor: 'transparent',
     fontWeight: '600',
   },
   predictedDisease: {
     fontSize: 22,
     fontWeight: '700',
     color: '#333',
-    // backgroundColor: 'transparent',
     marginTop: 5,
   },
   pickerContainer: {
@@ -175,9 +157,7 @@ const styles = StyleSheet.create({
     borderColor: 'black',
     borderWidth: 1,
     borderRadius: 5,
-    // backgroundColor: '#ffffff',
     backgroundColor: 'transparent',
-    alignContent: 'center',
   },
   dropdownStyle: {
     backgroundColor: 'transparent',
@@ -188,25 +168,25 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   button: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: 'yellowgreen',
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
-    shadowColor: '#4CAF50',
+    shadowColor: '#90ee90',
     shadowOpacity: 0.15,
     shadowOffset: { width: 0, height: 3 },
     shadowRadius: 5,
     elevation: 3,
   },
   buttonText: {
-    color: '#ffffff',
+    color: 'black',
     fontSize: 18,
     fontWeight: '600',
   },
   solutionContainer: {
     marginTop: 20,
     padding: 15,
-    backgroundColor: '#eafaf1',
+    backgroundColor: 'yellowgreen',
     borderRadius: 8,
     width: '90%',
     alignItems: 'center',
@@ -218,30 +198,17 @@ const styles = StyleSheet.create({
   },
   solutionText: {
     fontSize: 16,
-    color: '#333',
+    color: 'black',
     textAlign: 'center',
   },
   centeredContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f9f9f9',
   },
   loadingText: {
     marginTop: 10,
     fontSize: 16,
     color: '#555',
-  },
-  backButton: {
-    position: 'absolute', 
-    top: 40,
-    left: 20, 
-    flexDirection: 'row', 
-    alignItems: 'center'
-  },
-  backButtonText: {
-    color: "#007AFF", // iOS-like blue color for back button
-    fontSize: 16,
-    fontWeight: "bold",
   },
 });
