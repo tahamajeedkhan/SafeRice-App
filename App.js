@@ -19,8 +19,9 @@ import Profile from './components/Profile';
 import EditProfile from './components/Edit_Profile';
 import About from './components/About';
 import Nutrition_Extraction_Multi from './components/Nutrition_Extraction_Multi';
-import Nutrition_Extraction_Single from './components/Nutrition_Extraction_Single'; // New screen for single grain extraction
-import Nutrition_Extraction from './components/Nutrition_Extraction'; // New screen for choosing extraction type
+import Nutrition_Extraction_Single from './components/Nutrition_Extraction_Single';
+import Nutrition_Extraction from './components/Nutrition_Extraction';
+import Medicine from './components/Medicine'; 
 
 const AuthStack = createStackNavigator();
 const HomeStack = createStackNavigator();
@@ -105,7 +106,7 @@ function HomeStackScreen() {
         })}
       />
 
-      {/* Nutrition Extraction Options Screen */}
+      {/* Nutrition Extraction Screens */}
       <HomeStack.Screen
         name="Nutrition_Extraction"
         component={Nutrition_Extraction}
@@ -122,8 +123,6 @@ function HomeStackScreen() {
           ),
         })}
       />
-
-      {/* Nutrition Extraction Multi Screen */}
       <HomeStack.Screen
         name="Nutrition_Extraction_Multi"
         component={Nutrition_Extraction_Multi}
@@ -140,8 +139,6 @@ function HomeStackScreen() {
           ),
         })}
       />
-
-      {/* Nutrition Extraction Single Screen */}
       <HomeStack.Screen
         name="Nutrition_Extraction_Single"
         component={Nutrition_Extraction_Single}
@@ -151,6 +148,24 @@ function HomeStackScreen() {
             backgroundColor: 'lightblue',
           },
           title: "Nutrition Extraction Single Grain",
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Icon name="arrow-back" size={24} color="black" style={{ marginLeft: 10 }} />
+            </TouchableOpacity>
+          ),
+        })}
+      />
+
+      {/* Medicine Screen */}
+      <HomeStack.Screen
+        name="Medicine"
+        component={Medicine}
+        options={({ navigation }) => ({
+          headerShown: true,
+          headerStyle: {
+            backgroundColor: 'lightblue',
+          },
+          title: "Medicine",
           headerLeft: () => (
             <TouchableOpacity onPress={() => navigation.goBack()}>
               <Icon name="arrow-back" size={24} color="black" style={{ marginLeft: 10 }} />

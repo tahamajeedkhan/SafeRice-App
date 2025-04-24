@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import axios from "axios";
 import { BlurView } from "expo-blur";
+import config from "../../config/apiConfig";
 
 const SignUp = ({ navigation }) => {
   const [firstName, setFirstName] = useState("");
@@ -31,7 +32,8 @@ const SignUp = ({ navigation }) => {
     }
 
     try {
-      const response = await axios.post("http://192.168.18.8:5001/signup", {
+      const url = `${config.getUrl("database")}/signup`;
+      const response = await axios.post(url, {
         firstName,
         lastName,
         username,

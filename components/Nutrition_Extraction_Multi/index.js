@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Image, StyleSheet, ActivityIndicator, Ima
 import * as ImagePicker from 'expo-image-picker';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import axios from 'axios';
+import config from '../../config/apiConfig';
 
 export default function Nutrition_Extraction_Multi() {
   const [image, setImage] = useState(null);
@@ -44,7 +45,8 @@ export default function Nutrition_Extraction_Multi() {
     });
 
     try {
-      const response = await axios.post('http://192.168.18.8:5005/classify_grains', formData, {
+      const url = `${config.getUrl("nutrition_extract_multi_grain")}/classify_grains`;
+      const response = await axios.post(url, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       //console.log(response.data);

@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { BlurView } from "expo-blur";
+import config from "../../config/apiConfig"; // ✅ Import config
 
 const Login = ({ navigation }) => {
   const [username, setUsername] = useState("");
@@ -23,27 +23,21 @@ const Login = ({ navigation }) => {
     }
 
     try {
-      const response = await axios.post("http://192.168.18.8:5001/login", {
+      const url = `${config.getUrl("database")}/login`;
+      const response = await axios.post(url, {
         username,
         password,
       });
 
       if (response.data.success) {
-
-
-        // Store the JWT token and user ID in AsyncStorage
         await AsyncStorage.setItem("authToken", response.data.token);
         await AsyncStorage.setItem("use_id", response.data.use_id.toString());
 
-        // Display success message and navigate to MainMenu
         Alert.alert("Login Successful", "You are now logged in");
-        navigation.navigate('MainApp', {
-          screen: 'Home',
-          params: {
-            screen: 'MainMenu'
-          }
+        navigation.navigate("MainApp", {
+          screen: "Home",
+          params: { screen: "MainMenu" },
         });
-        
       } else {
         Alert.alert("Login Failed", response.data.message);
       }
@@ -83,7 +77,6 @@ const Login = ({ navigation }) => {
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
 
-
         <TouchableOpacity
           style={[styles.button, styles.signupButton]}
           onPress={() => navigation.navigate("SignUp")}
@@ -109,7 +102,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 36,
     fontWeight: "bold",
-    color: 'black',
+    color: "black",
     marginBottom: 30,
     textAlign: "center",
   },
@@ -150,7 +143,5 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
-
-
 
 export default Login;

@@ -5,6 +5,8 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 import { BlurView } from 'expo-blur';
+import config from '../../config/apiConfig';
+
 
 export default function HealthModel() {
   const [image, setImage] = useState(null);
@@ -53,7 +55,8 @@ export default function HealthModel() {
     });
 
     try {
-      const response = await axios.post('http://192.168.18.8:5000/diagnoseHealth', formData, {
+      const url = `${config.getUrl("health")}/diagnoseHealth`;
+      const response = await axios.post(url, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setPrediction(response.data.diagnosis);

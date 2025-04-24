@@ -5,6 +5,7 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 import { BlurView } from 'expo-blur';
+import config from '../../config/apiConfig';
 
 export default function RiceClassificationModel() {
   const [image, setImage] = useState(null);
@@ -53,7 +54,8 @@ export default function RiceClassificationModel() {
     });
 
     try {
-      const response = await axios.post('http://192.168.18.8:5003/diagnoseRiceType', formData, {
+      const url = `${config.getUrl("rice_classification")}/diagnoseRiceType`;
+      const response = await axios.post(url, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setPrediction(response.data.diagnosis);

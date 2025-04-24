@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TextInput, ImageBackground, ActivityIndicator, 
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import config from '../../config/apiConfig';
 
 const EditProfile = ({ navigation }) => {
   const [firstName, setFirstName] = useState('');
@@ -32,7 +33,8 @@ const EditProfile = ({ navigation }) => {
     if (token && userId) {
       const fetchUserData = async () => {
         try {
-          const response = await fetch('http://192.168.18.8:5001/getProfile', {
+          const url = `${config.getUrl("database")}/getProfile`;
+          const response = await fetch(url, {
             method: 'GET',
             headers: {
               Authorization: `Bearer ${token}`,
@@ -60,7 +62,8 @@ const EditProfile = ({ navigation }) => {
   const saveChanges = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://192.168.18.8:5001/updateProfile', {
+      const url = `${config.getUrl("database")}/updateProfile`;
+      const response = await fetch(url, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

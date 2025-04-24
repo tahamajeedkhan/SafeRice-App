@@ -2,6 +2,7 @@ import React, { useLayoutEffect, useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, ImageBackground, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import config from '../../config/apiConfig';
 
 const MainMenu = ({ navigation }) => {
   const [username, setUsername] = useState(null);
@@ -28,7 +29,8 @@ const MainMenu = ({ navigation }) => {
       const fetchUsername = async () => {
         try {
           setLoading(true);
-          const response = await fetch('http://192.168.18.8:5001/getUsername', {
+          const url = `${config.getUrl("database")}/getUsername`;
+          const response = await fetch(url, {
             method: 'GET',
             headers: {
               Authorization: `Bearer ${token}`,
@@ -57,7 +59,8 @@ const MainMenu = ({ navigation }) => {
       return;
     }
     try {
-      const response = await fetch('http://192.168.18.8:5001/logout', {
+      const url = `${config.getUrl("database")}/logout`;
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -123,9 +126,9 @@ const MainMenu = ({ navigation }) => {
     },
     {
       id: 6,
-      title: 'Medicine by Disease',
+      title: 'Medicine',
       image: require('../../assets/medicine.png'),
-      navigateTo: 'Medicine_By_Disease',
+      navigateTo: 'Medicine',
     },
     {
       id: 7,
